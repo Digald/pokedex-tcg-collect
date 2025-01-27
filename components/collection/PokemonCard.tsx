@@ -1,17 +1,40 @@
 import { useState } from "react";
+import { savePokemonStatus } from "@/lib/db/local";
+
+type StatusKeys = keyof typeof initialStatus;
+const initialStatus = {
+  isCollected: false,
+  isDoubleRare: false,
+  isIllustrationRare: false,
+  isUltraRare: false,
+  isSpecialIllustrationRare: false,
+  isHyperRare: false,
+} as const;
 
 export function PokemonCard({ pokemon }: { pokemon: any }) {
   const [status, setStatus] = useState({
-    isCollected: false,
-    isDoubleRare: false,
-    isIllustrationRare: false,
-    isUltraRare: false,
-    isSpecialIllustrationRare: false,
-    isHyperRare: false,
+    isCollected: pokemon.isCollected,
+    isDoubleRare: pokemon.isDoubleRare,
+    isIllustrationRare: pokemon.isIllustrationRare,
+    isUltraRare: pokemon.isUltraRare,
+    isSpecialIllustrationRare: pokemon.isSpecialIllustrationRare,
+    isHyperRare: pokemon.isHyperRare,
   });
 
-  const onStatusChange = (field: string, value: boolean) => {
-    setStatus((prev) => ({ ...prev, [field]: value }));
+  const onStatusChange = async (id: StatusKeys, value: boolean) => {
+    try {
+      const newStatus = { ...status, [id]: value };
+      await savePokemonStatus({
+        pokemonId: pokemon.id,
+        ...newStatus,
+      });
+      setStatus(newStatus);
+      console.log(newStatus);
+    } catch (error) {
+      console.error("Failed to save pokemon status:", error);
+      // Optionally revert the checkbox if save fails
+      // setStatus(status);
+    }
   };
 
   return (
@@ -37,34 +60,51 @@ export function PokemonCard({ pokemon }: { pokemon: any }) {
         </div>
 
         <div className="space-y-3">
-          {[
-            { id: "isCollected", label: "Collected", color: "blue" },
-            {
-              id: "isDoubleRare",
-              label: "Double Rare (Two Black Stars)",
-              color: "purple",
-            },
-            {
-              id: "isIllustrationRare",
-              label: "Illustration Rare (One Gold Star)",
-              color: "green",
-            },
-            {
-              id: "isUltraRare",
-              label: "Ultra Rare (Two Silver Stars)",
-              color: "orange",
-            },
-            {
-              id: "isSpecialIllustrationRare",
-              label: "Special Illustration Rare (Two Gold Stars)",
-              color: "yellow",
-            },
-            {
-              id: "isHyperRare",
-              label: "Hyper Rare (Three Gold Stars)",
-              color: "red",
-            },
-          ].map(({ id, label, color }) => (
+          {(
+            [
+              {
+                id: "isCollected" as const,
+                label: "Collected",
+                color: "blue",
+                value: pokemon.isCollected,
+              },
+              {
+                id: "isDoubleRare" as const,
+                label: "Double Rare (Two Black Stars)",
+                color: "purple",
+                value: pokemon.isDoubleRare,
+              },
+              {
+                id: "isIllustrationRare" as const,
+                label: "Illustration Rare (One Gold Star)",
+                color: "green",
+                value: pokemon.isIllustrationRare,
+              },
+              {
+                id: "isUltraRare" as const,
+                label: "Ultra Rare (Two Silver Stars)",
+                color: "orange",
+                value: pokemon.isUltraRare,
+              },
+              {
+                id: "isSpecialIllustrationRare" as const,
+                label: "Special Illustration Rare (Two Gold Stars)",
+                color: "yellow",
+                value: pokemon.isSpecialIllustrationRare,
+              },
+              {
+                id: "isHyperRare" as const,
+                label: "Hyper Rare (Three Gold Stars)",
+                color: "red",
+                value: pokemon.isHyperRare,
+              },
+            ] satisfies {
+              id: StatusKeys;
+              label: string;
+              color: string;
+              value: boolean;
+            }[]
+          ).map(({ id, label, color, value }) => (
             <div
               key={id}
               className={`p-2 rounded-lg transition-colors ${
@@ -83,7 +123,7 @@ export function PokemonCard({ pokemon }: { pokemon: any }) {
                 </span>
                 <input
                   type="checkbox"
-                  checked={status[id]}
+                  checked={value}
                   onChange={(e) => onStatusChange(id, e.target.checked)}
                   className={`rounded border-gray-300 text-${color}-600 focus:ring-${color}-500`}
                 />

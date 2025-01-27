@@ -33,3 +33,16 @@ if (typeof window !== 'undefined') {
 }
 
 export { db };
+
+// Example functions to interact with the database
+export async function savePokemonStatus(pokemonData: PokemonCollection) {
+  return await db.collection.put(pokemonData);
+}
+
+export async function getPokemonStatus(pokemonId: number) {
+  return await db.collection.get(pokemonId);
+}
+
+export async function updatePokemonStatus(pokemonId: number, updates: Partial<PokemonCollection>) {
+  return await db.collection.update(pokemonId, updates);
+}
