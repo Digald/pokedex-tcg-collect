@@ -1,4 +1,3 @@
-// lib/db/local.ts
 import Dexie from "dexie";
 // import { BasePokemon } from "@/lib/utils/pokemonData";
 
@@ -8,9 +7,12 @@ interface PokemonCollection {
   isCollected: boolean;
   isDoubleRare: boolean;
   isIllustrationRare: boolean;
-  dateCollected?: Date;
-  notes?: string;
+  isUltraRare: boolean;
+  isSpecialIllustrationRare: boolean;
+  isHyperRare: boolean;
 }
+
+let db: PokemonDatabase;
 
 export class PokemonDatabase extends Dexie {
   collection!: Dexie.Table<PokemonCollection, number>;
@@ -20,9 +22,14 @@ export class PokemonDatabase extends Dexie {
 
     this.version(1).stores({
       // We only store the collection status, not the basic Pokémon data
-      collection: "pokemonId, isCollected, isDoubleRare, isIllustrationRare",
+      collection:
+        "pokemonId, isCollected, isDoubleRare, isIllustrationRare, isSpecialIllustrationRare, isUltraRare, isHyperRare",
     });
   }
 }
 
-export const db = new PokemonDatabase();
+if (typeof window !== 'undefined') {
+  db = new PokemonDatabase();
+}
+
+export { db };

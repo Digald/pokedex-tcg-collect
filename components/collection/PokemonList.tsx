@@ -1,4 +1,4 @@
-// components/collection/PokemonList.tsx
+"use client";
 import { useEffect, useState } from "react";
 import { getAllPokemon, BasePokemon } from "@/lib/utils/pokemonData";
 import { db } from "@/lib/db/local";
@@ -8,6 +8,9 @@ interface PokemonWithStatus extends BasePokemon {
   isCollected: boolean;
   isDoubleRare: boolean;
   isIllustrationRare: boolean;
+  isUltraRare: boolean;
+  isSpecialIllustrationRare: boolean;
+  isHyperRare: boolean;
 }
 
 export function PokemonList() {
@@ -31,6 +34,9 @@ export function PokemonList() {
           isCollected: status?.isCollected ?? false,
           isDoubleRare: status?.isDoubleRare ?? false,
           isIllustrationRare: status?.isIllustrationRare ?? false,
+          isUltraRare: status?.isUltraRare ?? false,
+          isSpecialIllustrationRare: status?.isSpecialIllustrationRare ?? false,
+          isHyperRare: status?.isHyperRare ?? false,
         };
       });
 
